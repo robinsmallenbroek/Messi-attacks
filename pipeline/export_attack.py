@@ -308,6 +308,16 @@ def main():
         "actor":      p.get("actor", False),
     } for p in ff]
 
+    # ── Normaliseer t_seconds zodat het eerste event op t=0 zit ───────────────
+    # Belangrijk: de raw StatsBomb timestamps zijn HH:MM:SS vanaf periode-start.
+    # Voor onze possession in minuut 37 is dat ~2278s.  Voor de frontend (waar
+    # progressToRealTime [0..duration] geeft) MOET dit relatief zijn — anders
+    # vergelijkt de viz negatieve seconden en wordt niets zichtbaar.
+    if exported_events:
+        t0 = exported_events[0]["t_seconds"]
+        for e in exported_events:
+            e["t_seconds"] = round(e["t_seconds"] - t0, 3)
+
     # ── Possession-totalen ─────────────────────────────────────────────────────
     duration = exported_events[-1]["t_seconds"] - exported_events[0]["t_seconds"] if len(exported_events) >= 2 else 0
     n_dribbles = sum(1 for e in exported_events if e["type"] == "Dribble")
