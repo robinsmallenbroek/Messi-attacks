@@ -176,7 +176,15 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
   }
 
   // ── Ball trail ─────────────────────────────────────────────────────────────
-  type Segment = { x1:number; y1:number; x2:number; y2:number; tStart:number; tEnd:number; emphasis:number };
+  // Each segment is tagged by kind so we can render it differently:
+  //   carry → dotted (ball under foot control)
+  //   pass  → solid straight line (ball in the air, straight from foot)
+  //   other → faint solid (transitions between events; usually zero length)
+  type SegmentKind = "carry" | "pass" | "other";
+  type Segment = {
+    x1:number; y1:number; x2:number; y2:number;
+    tStart:number; tEnd:number; emphasis:number; kind: SegmentKind;
+  };
   const segments: Segment[] = [];
   let prev: AttackEvent | null = null;
   for (const e of events) {
@@ -187,18 +195,20 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
         segments.push({
           x1: px(prev.location[0]), y1: py(prev.location[1]),
           x2: px(prev.carry.end_location[0]), y2: py(prev.carry.end_location[1]),
-          tStart: prev.t_seconds, tEnd: prev.t_seconds + carryDur, emphasis: 0.55,
+          tStart: prev.t_seconds, tEnd: prev.t_seconds + carryDur, emphasis: 0.65, kind: "carry",
         });
         segments.push({
           x1: px(prev.carry.end_location[0]), y1: py(prev.carry.end_location[1]),
           x2: px(e.location[0]), y2: py(e.location[1]),
-          tStart: prev.t_seconds + carryDur, tEnd: e.t_seconds, emphasis: 0.35,
+          tStart: prev.t_seconds + carryDur, tEnd: e.t_seconds, emphasis: 0.30, kind: "other",
         });
       } else {
+        const kind: SegmentKind = prev.type === "Pass" ? "pass" : "other";
         segments.push({
           x1: px(prev.location[0]), y1: py(prev.location[1]),
           x2: px(e.location[0]), y2: py(e.location[1]),
-          tStart: prev.t_seconds, tEnd: e.t_seconds, emphasis: 0.45,
+          tStart: prev.t_seconds, tEnd: e.t_seconds,
+          emphasis: kind === "pass" ? 0.55 : 0.40, kind,
         });
       }
     }
@@ -261,7 +271,10 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
     <g fontFamily={FONT.sans}>
       <FieldLines px={px} py={py} x={x} y={y} width={width} height={height} />
 
-      {/* Trail */}
+      {/* Trail — segment style depends on kind:
+            • carry → dotted line (ball under foot control)
+            • pass  → solid straight (ball in the air, straight from foot)
+            • other → faint solid (transitions; usually zero length) */}
       <g opacity={inShotHold ? 0.55 : 1}>
         {segments.map((s, i) => {
           if (realTime <= s.tStart) return null;
@@ -269,13 +282,67 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
           const local = span > 0 ? Math.min(1, (realTime - s.tStart) / span) : 1;
           const ex = s.x1 + (s.x2 - s.x1) * local;
           const ey = s.y1 + (s.y2 - s.y1) * local;
+          const dash = s.kind === "carry" ? "3 2.5" : undefined;
           return (
             <line key={i} x1={s.x1} y1={s.y1} x2={ex} y2={ey}
                   stroke={C.messi} strokeWidth={1.7} opacity={s.emphasis}
-                  strokeLinecap="round" />
+                  strokeLinecap="round" strokeDasharray={dash} />
           );
         })}
       </g>
+
+      {/* Shot trajectory — curved arc from Messi's shot location to where the
+          ball ended up.  Curve height scales with shot.end_height so a high
+          shot bows more than a ground shot.  Drawn progressively during the
+          shot-hold phase using a de Casteljau split of the quadratic bezier. */}
+      {shotEvent?.location && shotEnd && (() => {
+        // How far through the shot animation are we?  Driven by phaseProgress
+        // during shot-hold (since realTime is frozen there); 0 before shot;
+        // 1 once shot-hold passes its first ~35%.
+        let draw = 0;
+        if (inShotHold) {
+          draw = Math.max(0, Math.min(1, phaseProgress / 0.35));
+        } else if (realTime >= shotEvent.t_seconds) {
+          draw = 1;
+        }
+        if (draw <= 0) return null;
+
+        const startX = px(shotEvent.location[0]);
+        const startY = py(shotEvent.location[1]);
+        const endX = px(shotEnd[0]);
+        const endY = py(shotEnd[1]);
+
+        const midX = (startX + endX) / 2;
+        const midY = (startY + endY) / 2;
+        const height = (shotEvent.shot?.end_height ?? 0);
+        // Arc bows "up" in screen space (smaller SVG y).  Offset proportional
+        // to ball-height-at-goal-line — low shots barely curve, high shots
+        // arch.  Minimum 16 so even a ground shot reads as a shot, not a pass.
+        const arcOffset = 16 + height * 8;
+        const ctrlX = midX;
+        const ctrlY = midY - arcOffset;
+
+        // de Casteljau split at parameter t = draw, giving us the partial curve
+        const t = draw;
+        const Q0x = (1 - t) * startX + t * ctrlX;
+        const Q0y = (1 - t) * startY + t * ctrlY;
+        const Q1x = (1 - t) * ctrlX + t * endX;
+        const Q1y = (1 - t) * ctrlY + t * endY;
+        const Rx  = (1 - t) * Q0x + t * Q1x;
+        const Ry  = (1 - t) * Q0y + t * Q1y;
+
+        return (
+          <g>
+            <path d={`M ${startX} ${startY} Q ${Q0x} ${Q0y} ${Rx} ${Ry}`}
+                  stroke={C.shot} strokeWidth={1.9} fill="none"
+                  strokeLinecap="round" opacity={0.95} />
+            {/* Ball-end marker once the arc fully draws */}
+            {draw >= 1 && (
+              <circle cx={endX} cy={endY} r={3.5} fill={C.shot} />
+            )}
+          </g>
+        );
+      })()}
 
       {/* Dribble effect ring */}
       <g>
@@ -384,17 +451,7 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
             </g>
           )}
 
-          {/* Shot trajectory — Messi → end_location (if known) */}
-          {shotEnd && revealProgress > 0.3 && (
-            <g opacity={Math.min(1, (revealProgress - 0.3) / 0.3)}>
-              <line x1={px(shotLoc[0])} y1={py(shotLoc[1])}
-                    x2={px(shotEnd[0])} y2={py(shotEnd[1])}
-                    stroke={C.shot} strokeWidth={1.6}
-                    strokeDasharray="3 2" />
-              <circle cx={px(shotEnd[0])} cy={py(shotEnd[1])} r={3.5}
-                      fill={C.shot} />
-            </g>
-          )}
+          {/* (shot trajectory is drawn separately as a curved arc above) */}
 
           {/* Freeze-frame players, staggered */}
           {ffSorted.map((p, i) => {
