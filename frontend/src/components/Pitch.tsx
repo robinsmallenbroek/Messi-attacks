@@ -63,42 +63,71 @@ function lerpColor(a: string, b: string, t: number): string {
   return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${blue.toString(16).padStart(2, "0")}`;
 }
 
+/** Interpolate the ball position at attack-time t.
+ *
+ *  Model:  the ball is always "in" some event's window.  Each ball-event e
+ *  occupies the time-range [e.t_seconds, nextBallEvent.t_seconds).  Within
+ *  that range:
+ *
+ *    • Carry:        ball moves from e.location to e.carry.end_location
+ *                    over min(e.duration, nextEvent − e.t_seconds), then
+ *                    travels to nextEvent.location over the remainder.
+ *    • Pass:         ball travels from e.location to next.location over the
+ *                    full window (a pass in flight).
+ *    • Other (Ball Receipt, Dribble, Shot, Interception, Block, ...):
+ *                    ball sits at e.location.  If a later ball-event exists,
+ *                    we still travel toward it during the gap, because the
+ *                    real ball never teleports.
+ */
 function ballAt(events: AttackEvent[], t: number): Location | null {
-  let cur: Location | null = null;
-  for (let i = 0; i < events.length; i++) {
-    const e = events[i];
-    if (!isBallEvent(e) || !e.location) continue;
-    if (e.t_seconds > t) {
-      if (!cur) return e.location;
-      let prev: AttackEvent | null = null;
-      for (let j = i - 1; j >= 0; j--) {
-        if (isBallEvent(events[j]) && events[j].location) { prev = events[j]; break; }
-      }
-      if (!prev || !prev.location) return cur;
-      const span = e.t_seconds - prev.t_seconds;
-      const local = span > 0 ? (t - prev.t_seconds) / span : 0;
-      const from = prev.type === "Carry" && prev.carry?.end_location ? prev.carry.end_location : prev.location;
-      return [
-        from[0] + (e.location[0] - from[0]) * local,
-        from[1] + (e.location[1] - from[1]) * local,
-      ];
-    }
+  const ballEvents = events.filter(e => isBallEvent(e) && e.location);
+  if (ballEvents.length === 0) return null;
+  if (t <= ballEvents[0].t_seconds) return ballEvents[0].location;
+
+  for (let i = 0; i < ballEvents.length; i++) {
+    const e = ballEvents[i];
+    const next = ballEvents[i + 1];
+    const windowEnd = next ? next.t_seconds : (e.t_seconds + (e.duration ?? 0));
+
+    if (t < e.t_seconds || t >= windowEnd) continue;
+
+    // We are inside event e's time window.
     if (e.type === "Carry" && e.carry?.end_location) {
       const carryDur = e.duration ?? 0;
-      if (carryDur > 0 && t < e.t_seconds + carryDur) {
-        const local = (t - e.t_seconds) / carryDur;
-        cur = [
-          e.location[0] + (e.carry.end_location[0] - e.location[0]) * local,
-          e.location[1] + (e.carry.end_location[1] - e.location[1]) * local,
+      const carryEndsAt = Math.min(e.t_seconds + carryDur, windowEnd);
+      if (t < carryEndsAt) {
+        const local = (t - e.t_seconds) / Math.max(0.001, carryEndsAt - e.t_seconds);
+        return [
+          e.location![0] + (e.carry.end_location[0] - e.location![0]) * local,
+          e.location![1] + (e.carry.end_location[1] - e.location![1]) * local,
         ];
-      } else {
-        cur = e.carry.end_location;
       }
-    } else {
-      cur = e.location;
+      // Carry finished, ball drifts toward next event's start location.
+      if (next?.location) {
+        const drift = (t - carryEndsAt) / Math.max(0.001, windowEnd - carryEndsAt);
+        return [
+          e.carry.end_location[0] + (next.location[0] - e.carry.end_location[0]) * drift,
+          e.carry.end_location[1] + (next.location[1] - e.carry.end_location[1]) * drift,
+        ];
+      }
+      return e.carry.end_location;
     }
+
+    // Non-carry: travel toward the next event's location over the window.
+    if (next?.location) {
+      const local = (t - e.t_seconds) / Math.max(0.001, windowEnd - e.t_seconds);
+      return [
+        e.location![0] + (next.location[0] - e.location![0]) * local,
+        e.location![1] + (next.location[1] - e.location![1]) * local,
+      ];
+    }
+    return e.location;
   }
-  return cur;
+
+  // t after the last ball-event window: stay at the last known position.
+  const last = ballEvents[ballEvents.length - 1];
+  if (last.type === "Carry" && last.carry?.end_location) return last.carry.end_location;
+  return last.location;
 }
 
 function dist(a: Location, b: Location): number {
