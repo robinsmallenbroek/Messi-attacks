@@ -1,0 +1,77 @@
+[
+  {
+    "label": "CL-finale 2011 — Messi-goal Wembley",
+    "match_id": 18236,
+    "target_minute": 54,
+    "tolerance": 5,
+    "target_outcome": "Goal",
+    "target_player": "Lionel Andrés Messi Cuccittini",
+    "_note": "Possession start ligt op min=52 in de data (schot op ~min 54). target_outcome=Goal + target_player filtert correct naar poss=104."
+  },
+  {
+    "label": "El Clásico 5-0, nov 2010 — Barcelona vs Real Madrid",
+    "match_date": "2010-11-29",
+    "home_team": "Barcelona",
+    "away_team": "Real Madrid",
+    "target_minute": 56,
+    "tolerance": 4,
+    "target_outcome": "Goal"
+  },
+  {
+    "label": "El Clásico 0-5, mei 2009 — Real Madrid vs Barcelona",
+    "match_date": "2009-05-02",
+    "home_team": "Real Madrid",
+    "away_team": "Barcelona",
+    "target_minute": 23,
+    "tolerance": 8,
+    "target_outcome": "Goal",
+    "_note": "Gebruiker zei minuut 23, maar er is geen goal op min 23 in de data. Dichtste goal is poss=49 op min=16 (7 minuten verschil). Tolerantie uitgebreid naar 8 om deze te bereiken. Mogelijk heeft de gebruiker een verkeerde minuut; dit moet worden bevestigd."
+  },
+  {
+    "label": "Messi winner Bernabéu, apr 2017",
+    "match_date": "2017-04-23",
+    "home_team": "Real Madrid",
+    "away_team": "Barcelona",
+    "target_minute": 92,
+    "tolerance": 3,
+    "target_outcome": "Goal",
+    "target_player": "Lionel Andrés Messi Cuccittini"
+  },
+  {
+    "label": "Messi chip vs Real Betis, mrt 2019",
+    "match_date": "2019-03-17",
+    "home_team": "Real Betis",
+    "away_team": "Barcelona",
+    "target_minute": 45,
+    "tolerance": 3,
+    "target_outcome": "Goal",
+    "target_player": "Lionel Andrés Messi Cuccittini"
+  },
+  {
+    "label": "CL-finale 2015 — Neymar-goal vs Juventus (90+6')",
+    "match_id": 18242,
+    "target_minute": 96,
+    "tolerance": 3,
+    "target_outcome": "Goal",
+    "_note": "Suárez-goal (min 68) haalt de qualifying-filter niet (te weinig Messi-events en/of onvoldoende progressie). Vroegste alternatief is Rakitić-goal (min 2), maar Neymar's afsluitende goal (min 96) heeft meer narratieve kracht als slot van de finale."
+  },
+  {
+    "label": "CL-finale 2009 — Messi kopbal Rome",
+    "match_id": 3750201,
+    "target_minute": 70,
+    "tolerance": 5,
+    "target_outcome": "Goal",
+    "target_player": "Lionel Andrés Messi Cuccittini",
+    "_note": "Messi's header in de 70e minuut; in de data ligt de possession-start op min=69."
+  },
+  {
+    "label": "Messi Zaragoza-solo, apr 2012",
+    "match_date": "2012-04-07",
+    "home_team": "Real Zaragoza",
+    "away_team": "Barcelona",
+    "target_minute": 37,
+    "tolerance": 3,
+    "target_outcome": "Goal",
+    "target_player": "Lionel Andrés Messi Cuccittini"
+  }
+]

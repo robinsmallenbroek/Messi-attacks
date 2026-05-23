@@ -1,0 +1,488 @@
+{
+  "meta": {
+    "match_id": 70219,
+    "possession_id": 71,
+    "match_date": "2012-04-07",
+    "competition": "La Liga",
+    "season": "2011\/2012",
+    "home_team": "Real Zaragoza",
+    "away_team": "Barcelona",
+    "score": "1-4",
+    "minute": 37,
+    "duration_seconds": 10.218,
+    "n_events": 11,
+    "n_dribbles": 1,
+    "n_carries": 3,
+    "n_passes": 1,
+    "messi_touches_total": 5,
+    "opponents_beaten_total": 1,
+    "shot_xg": 0.11290507,
+    "shot_outcome": "Goal",
+    "scorer": "Lionel Andr\u00e9s Messi Cuccittini",
+    "pitch": {
+      "length": 120.0,
+      "width": 80.0
+    }
+  },
+  "barca_players": [
+    {
+      "id": 3385,
+      "name": "Alexis Alejandro S\u00e1nchez S\u00e1nchez",
+      "short_name": "Alexis",
+      "position": "Right Wing"
+    },
+    {
+      "id": 5503,
+      "name": "Lionel Andr\u00e9s Messi Cuccittini",
+      "short_name": "Messi",
+      "position": "Center Forward"
+    }
+  ],
+  "events": [
+    {
+      "id": "bc9b08b2-3376-4e4a-9a75-56d8c4903f93",
+      "index": 1428,
+      "period": 1,
+      "timestamp": "00:37:58.380",
+      "minute": 37,
+      "second": 58,
+      "t_seconds": 2278.38,
+      "type": "Interception",
+      "player_id": 3385,
+      "player_name": "Alexis Alejandro S\u00e1nchez S\u00e1nchez",
+      "player_short": "Alexis",
+      "team": "Barcelona",
+      "location": [
+        42.4,
+        58.5
+      ],
+      "duration": 0.0,
+      "under_pressure": false,
+      "inter_event_seconds": 0.0,
+      "ball_speed_mps": null,
+      "cumulative_messi_touches": 0,
+      "opponents_beaten_so_far": 0,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": null,
+      "shot": null
+    },
+    {
+      "id": "875307e8-0a7f-4bbc-bc24-abba3e685d09",
+      "index": 1429,
+      "period": 1,
+      "timestamp": "00:37:58.380",
+      "minute": 37,
+      "second": 58,
+      "t_seconds": 2278.38,
+      "type": "Carry",
+      "player_id": 3385,
+      "player_name": "Alexis Alejandro S\u00e1nchez S\u00e1nchez",
+      "player_short": "Alexis",
+      "team": "Barcelona",
+      "location": [
+        42.4,
+        58.5
+      ],
+      "duration": 5.5563,
+      "under_pressure": false,
+      "inter_event_seconds": 0.0,
+      "ball_speed_mps": null,
+      "cumulative_messi_touches": 0,
+      "opponents_beaten_so_far": 0,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": {
+        "end_location": [
+          85.6,
+          59.1
+        ]
+      },
+      "shot": null
+    },
+    {
+      "id": "03f31f28-2ae6-4c39-9afe-c72bf6de9671",
+      "index": 1430,
+      "period": 1,
+      "timestamp": "00:38:03.937",
+      "minute": 38,
+      "second": 3,
+      "t_seconds": 2283.937,
+      "type": "Pass",
+      "player_id": 3385,
+      "player_name": "Alexis Alejandro S\u00e1nchez S\u00e1nchez",
+      "player_short": "Alexis",
+      "team": "Barcelona",
+      "location": [
+        85.6,
+        59.1
+      ],
+      "duration": 1.5646,
+      "under_pressure": false,
+      "inter_event_seconds": 5.557,
+      "ball_speed_mps": 7.77,
+      "cumulative_messi_touches": 0,
+      "opponents_beaten_so_far": 0,
+      "pass": {
+        "id": 5503,
+        "name": "Lionel Andr\u00e9s Messi Cuccittini",
+        "short_name": "Messi"
+      },
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": null,
+      "shot": null
+    },
+    {
+      "id": "31a11772-3f81-4f17-b9d4-f2d14c189ac7",
+      "index": 1431,
+      "period": 1,
+      "timestamp": "00:38:05.000",
+      "minute": 38,
+      "second": 5,
+      "t_seconds": 2285.0,
+      "type": "Pressure",
+      "player_id": 26761,
+      "player_name": "Paulo C\u00e9sar Da Silva Barrios",
+      "player_short": "Barrios",
+      "team": "Real Zaragoza",
+      "location": [
+        97.6,
+        28.299999999999997
+      ],
+      "duration": 1.985,
+      "under_pressure": false,
+      "inter_event_seconds": 1.063,
+      "ball_speed_mps": null,
+      "cumulative_messi_touches": 0,
+      "opponents_beaten_so_far": 0,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": null,
+      "shot": null
+    },
+    {
+      "id": "089217e6-f521-4fd9-a1ee-b742113f6b8d",
+      "index": 1432,
+      "period": 1,
+      "timestamp": "00:38:05.501",
+      "minute": 38,
+      "second": 5,
+      "t_seconds": 2285.501,
+      "type": "Ball Receipt*",
+      "player_id": 5503,
+      "player_name": "Lionel Andr\u00e9s Messi Cuccittini",
+      "player_short": "Messi",
+      "team": "Barcelona",
+      "location": [
+        98.4,
+        29.3
+      ],
+      "duration": null,
+      "under_pressure": true,
+      "inter_event_seconds": 0.501,
+      "ball_speed_mps": 20.74,
+      "cumulative_messi_touches": 1,
+      "opponents_beaten_so_far": 0,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": null,
+      "shot": null
+    },
+    {
+      "id": "f48bdc7c-db76-4988-aaf0-52af7399e7e2",
+      "index": 1433,
+      "period": 1,
+      "timestamp": "00:38:05.501",
+      "minute": 38,
+      "second": 5,
+      "t_seconds": 2285.501,
+      "type": "Carry",
+      "player_id": 5503,
+      "player_name": "Lionel Andr\u00e9s Messi Cuccittini",
+      "player_short": "Messi",
+      "team": "Barcelona",
+      "location": [
+        98.4,
+        29.3
+      ],
+      "duration": 2.0721,
+      "under_pressure": true,
+      "inter_event_seconds": 0.0,
+      "ball_speed_mps": null,
+      "cumulative_messi_touches": 2,
+      "opponents_beaten_so_far": 0,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": {
+        "end_location": [
+          107.0,
+          27.9
+        ]
+      },
+      "shot": null
+    },
+    {
+      "id": "e3418973-0810-456b-9c1e-d5776901f73d",
+      "index": 1434,
+      "period": 1,
+      "timestamp": "00:38:07.573",
+      "minute": 38,
+      "second": 7,
+      "t_seconds": 2287.573,
+      "type": "Dribbled Past",
+      "player_id": 26761,
+      "player_name": "Paulo C\u00e9sar Da Silva Barrios",
+      "player_short": "Barrios",
+      "team": "Real Zaragoza",
+      "location": [
+        106.0,
+        26.9
+      ],
+      "duration": 0.0,
+      "under_pressure": false,
+      "inter_event_seconds": 2.072,
+      "ball_speed_mps": null,
+      "cumulative_messi_touches": 2,
+      "opponents_beaten_so_far": 0,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": null,
+      "shot": null
+    },
+    {
+      "id": "0a1cd206-a38b-4fc8-9179-b1ceb7de442e",
+      "index": 1435,
+      "period": 1,
+      "timestamp": "00:38:07.573",
+      "minute": 38,
+      "second": 7,
+      "t_seconds": 2287.573,
+      "type": "Dribble",
+      "player_id": 5503,
+      "player_name": "Lionel Andr\u00e9s Messi Cuccittini",
+      "player_short": "Messi",
+      "team": "Barcelona",
+      "location": [
+        107.0,
+        27.9
+      ],
+      "duration": 0.0,
+      "under_pressure": true,
+      "inter_event_seconds": 0.0,
+      "ball_speed_mps": 4.21,
+      "cumulative_messi_touches": 3,
+      "opponents_beaten_so_far": 1,
+      "pass": null,
+      "dribble": {
+        "outcome": "Complete"
+      },
+      "opponent_beaten": {
+        "id": 26761,
+        "name": "Paulo C\u00e9sar Da Silva Barrios",
+        "short_name": "Barrios",
+        "location": [
+          106.0,
+          26.9
+        ],
+        "team": "Real Zaragoza"
+      },
+      "carry": null,
+      "shot": null
+    },
+    {
+      "id": "e4a1f4f3-20f2-4335-9428-cab39a65246a",
+      "index": 1436,
+      "period": 1,
+      "timestamp": "00:38:07.573",
+      "minute": 38,
+      "second": 7,
+      "t_seconds": 2287.573,
+      "type": "Carry",
+      "player_id": 5503,
+      "player_name": "Lionel Andr\u00e9s Messi Cuccittini",
+      "player_short": "Messi",
+      "team": "Barcelona",
+      "location": [
+        107.0,
+        27.9
+      ],
+      "duration": 1.0246,
+      "under_pressure": true,
+      "inter_event_seconds": 0.0,
+      "ball_speed_mps": null,
+      "cumulative_messi_touches": 4,
+      "opponents_beaten_so_far": 1,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": {
+        "end_location": [
+          109.6,
+          30.1
+        ]
+      },
+      "shot": null
+    },
+    {
+      "id": "b905a61c-eb7a-4bf4-bdda-928c3c6597b1",
+      "index": 1437,
+      "period": 1,
+      "timestamp": "00:38:08.241",
+      "minute": 38,
+      "second": 8,
+      "t_seconds": 2288.241,
+      "type": "Pressure",
+      "player_id": 10815,
+      "player_name": "\u00c1d\u00e1m Pint\u00e9r",
+      "player_short": "Pint\u00e9r",
+      "team": "Real Zaragoza",
+      "location": [
+        109.9,
+        27.5
+      ],
+      "duration": 0.495146,
+      "under_pressure": false,
+      "inter_event_seconds": 0.668,
+      "ball_speed_mps": null,
+      "cumulative_messi_touches": 4,
+      "opponents_beaten_so_far": 1,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": null,
+      "shot": null
+    },
+    {
+      "id": "76f93e07-837b-4c77-9d75-e3b502fe1fd9",
+      "index": 1438,
+      "period": 1,
+      "timestamp": "00:38:08.598",
+      "minute": 38,
+      "second": 8,
+      "t_seconds": 2288.598,
+      "type": "Shot",
+      "player_id": 5503,
+      "player_name": "Lionel Andr\u00e9s Messi Cuccittini",
+      "player_short": "Messi",
+      "team": "Barcelona",
+      "location": [
+        109.6,
+        30.1
+      ],
+      "duration": 0.39719,
+      "under_pressure": true,
+      "inter_event_seconds": 0.357,
+      "ball_speed_mps": 3.32,
+      "cumulative_messi_touches": 5,
+      "opponents_beaten_so_far": 1,
+      "pass": null,
+      "dribble": null,
+      "opponent_beaten": null,
+      "carry": null,
+      "shot": {
+        "xg": 0.11290507,
+        "outcome": "Goal",
+        "end_location": [
+          120.0,
+          36.6
+        ],
+        "end_height": 2.0,
+        "technique": "Normal",
+        "body_part": "Left Foot"
+      }
+    }
+  ],
+  "freeze_frame": [
+    {
+      "location": [
+        104.8,
+        50.6
+      ],
+      "player_id": 3385,
+      "name": "Alexis Alejandro S\u00e1nchez S\u00e1nchez",
+      "short_name": "Alexis",
+      "position": "Right Wing",
+      "teammate": true,
+      "actor": false
+    },
+    {
+      "location": [
+        103.3,
+        27.3
+      ],
+      "player_id": 3478,
+      "name": "Francesc F\u00e0bregas i Soler",
+      "short_name": "Cesc",
+      "position": "Left Center Midfield",
+      "teammate": true,
+      "actor": false
+    },
+    {
+      "location": [
+        110.3,
+        33.0
+      ],
+      "player_id": 10815,
+      "name": "\u00c1d\u00e1m Pint\u00e9r",
+      "short_name": "Pint\u00e9r",
+      "position": "Left Defensive Midfield",
+      "teammate": false,
+      "actor": false
+    },
+    {
+      "location": [
+        109.4,
+        31.3
+      ],
+      "player_id": 26761,
+      "name": "Paulo C\u00e9sar Da Silva Barrios",
+      "short_name": "Barrios",
+      "position": "Right Center Back",
+      "teammate": false,
+      "actor": false
+    },
+    {
+      "location": [
+        110.0,
+        39.2
+      ],
+      "player_id": 26429,
+      "name": "Javier Paredes Arango",
+      "short_name": "Arango",
+      "position": "Left Center Back",
+      "teammate": false,
+      "actor": false
+    },
+    {
+      "location": [
+        118.4,
+        36.9
+      ],
+      "player_id": 6571,
+      "name": "Roberto Jim\u00e9nez Gago",
+      "short_name": "Gago",
+      "position": "Goalkeeper",
+      "teammate": false,
+      "actor": false
+    },
+    {
+      "location": [
+        95.2,
+        28.2
+      ],
+      "player_id": 26837,
+      "name": "Pablo Sebasti\u00e1n Valeira \u00c1lvarez",
+      "short_name": "\u00c1lvarez",
+      "position": "Right Back",
+      "teammate": false,
+      "actor": false
+    }
+  ]
+}

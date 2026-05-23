@@ -1,0 +1,20 @@
+# StatsBomb raw data — te groot voor git (~13GB)
+data/statsbomb-open-data/
+
+# Processed possessions — 69MB, regenereerbaar via extract_possessions.py
+data/processed/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+pipeline/.env
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# OS
+.DS_Store

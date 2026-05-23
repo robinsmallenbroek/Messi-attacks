@@ -1,0 +1,2 @@
+pandas>=2.0
+ujson>=5.0
