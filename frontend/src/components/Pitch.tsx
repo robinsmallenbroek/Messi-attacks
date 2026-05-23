@@ -1,4 +1,4 @@
-import type { AttackData, AttackEvent, Location, FreezeFramePlayer } from "../types";
+import type { AttackData, AttackEvent, Location } from "../types";
 import { C, FONT } from "../lib/theme";
 import { isBallEvent } from "../lib/geometry";
 

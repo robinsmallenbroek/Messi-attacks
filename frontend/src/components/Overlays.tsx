@@ -76,7 +76,7 @@ export function IntroOverlay({ data }: { data: AttackData }) {
 /** Outro overlay — appears after the freeze-frame reveal finishes.
  *  Sits as a band BELOW the visualization (not fullscreen) so the freeze
  *  frame stays on screen as the takeaway is read. */
-export function OutroPanel({ data }: { data: AttackData }) {
+export function OutroPanel(_props: { data: AttackData }) {
   const progress = usePlayback((s) => s.progress);
   const mode     = usePlayback((s) => s.mode);
   const reset    = usePlayback((s) => s.reset);
