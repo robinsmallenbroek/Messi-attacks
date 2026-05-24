@@ -1,3 +1,17 @@
+// =============================================================================
+//  AttackScene — root SVG canvas, layer-aware.
+//
+//  THREE LAYERS (see frontend/src/LAYERS.md for full table):
+//    BASIS      — always visible:  pitch, ball, players, timeline, leader-line,
+//                                  freeze-frame, metric strip
+//    HOE        — visible if lens.hoe:  pressure ring, knikpunten, percentile
+//                                       contexts at dribble and shot
+//    WANNEER    — visible if lens.wanneer:  (stap 6; placeholder only here)
+//
+//  Conditional rendering convention:
+//    Components that belong to a lens read `usePlayback(s => s.lens.X)` and
+//    return null when off.  Basis components never read `lens.*`.
+// =============================================================================
 import type { AttackData } from "../types";
 import Pitch, { pitchBallPosition } from "./Pitch";
 import Timeline, { timelinePlayheadX } from "./Timeline";
@@ -13,6 +27,7 @@ export default function AttackScene({ data }: Props) {
   const progress  = usePlayback((s) => s.progress);
   const realTime  = progressToRealTime(progress);
   const { phase, phaseProgress } = getPhaseInfo(progress);
+  const wanneerOn = usePlayback((s) => s.lens.wanneer);
 
   const W = 1280;
   const H = 860;
@@ -71,6 +86,21 @@ export default function AttackScene({ data }: Props) {
             textAnchor="end" fontFamily={FONT.sans}>
         {phase.label?.replace(/-/g, " ").toUpperCase()}
       </text>
+
+      {/* Wanneer-laag preview placeholder — toont alleen dat de schakelaar
+          functioneel is; echte content komt in stap 6. */}
+      {wanneerOn && (
+        <g>
+          <rect x={pitchX + pitchW - 220} y={pitchY + 8} width={212} height={22}
+                fill={C.bg} stroke={C.line} strokeWidth={0.6} opacity={0.85} />
+          <text x={pitchX + pitchW - 12} y={pitchY + 22}
+                fill={C.textDim} fontSize={10} letterSpacing="0.16em"
+                textAnchor="end" fontFamily={FONT.sans}
+                fontStyle="italic">
+            Wanneer-laag · komt in stap 6
+          </text>
+        </g>
+      )}
 
       <Timeline data={data} x={tlX} y={tlY} width={tlW} height={tlH}
                 realTime={realTime} />

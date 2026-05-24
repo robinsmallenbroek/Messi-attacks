@@ -108,3 +108,50 @@ export interface AttackData {
 }
 
 export type PlaybackMode = "cinematic" | "scroll";
+
+// ── Reference statistics (output of pipeline/compute_references.py) ──────────
+
+export interface StatPercentiles {
+  n: number;
+  mean: number | null;
+  median: number | null;
+  min: number | null;
+  max: number | null;
+  p10: number | null;
+  p25: number | null;
+  p50: number | null;
+  p75: number | null;
+  p90: number | null;
+  p95: number | null;
+  p99: number | null;
+}
+
+export interface RefVariants {
+  all:   StatPercentiles;
+  messi: StatPercentiles;
+}
+
+export interface ReferenceStats {
+  version: string;
+  n_possessions: number;
+  note: string;
+  hoe: {
+    pass_precision:               RefVariants;
+    pressure_rate:                RefVariants;
+    dribble_success:              RefVariants;
+    opponents_beaten:             RefVariants;
+    direction_changes:            RefVariants;
+    space_to_nearest_at_shot_m:   RefVariants;
+    pass_chain_length:            StatPercentiles;
+    unique_teammates:             StatPercentiles;
+  };
+  wanneer: {
+    carry_speed_mps:              RefVariants;
+    pass_speed_mps:               RefVariants;
+    acceleration_mps2:            RefVariants;
+    n_pauses_2s:                  StatPercentiles;
+    max_pause_s:                  StatPercentiles;
+    progression_speed_mps:        StatPercentiles;
+    total_duration_s:             StatPercentiles;
+  };
+}

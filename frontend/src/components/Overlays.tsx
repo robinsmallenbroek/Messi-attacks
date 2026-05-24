@@ -75,11 +75,17 @@ export function IntroOverlay({ data }: { data: AttackData }) {
 
 /** Outro overlay — appears after the freeze-frame reveal finishes.
  *  Sits as a band BELOW the visualization (not fullscreen) so the freeze
- *  frame stays on screen as the takeaway is read. */
+ *  frame stays on screen as the takeaway is read.
+ *
+ *  The panel itself is BASIS-viz (always shown).  Its TEXT content depends
+ *  on lens state — Hoe-on weaves signal references (pressure 100%, 2
+ *  richtingswisselingen, top 5% gepasseerd, krapper dan 83% van schoten)
+ *  into the narrative; Hoe-off keeps a matter-of-fact recap. */
 export function OutroPanel(_props: { data: AttackData }) {
   const progress = usePlayback((s) => s.progress);
   const mode     = usePlayback((s) => s.mode);
   const reset    = usePlayback((s) => s.reset);
+  const hoeOn    = usePlayback((s) => s.lens.hoe);
 
   // Show only when the playback has fully completed.
   const visible = mode === "cinematic" && progress >= 1;
@@ -95,16 +101,32 @@ export function OutroPanel(_props: { data: AttackData }) {
                     textTransform: "uppercase", marginBottom: 14 }}>
         Wat de data toonde
       </div>
-      <div style={{ fontFamily: FONT.serif, fontSize: 22, lineHeight: 1.45,
-                    color: C.text, fontWeight: 300, maxWidth: 720 }}>
-        Messi schoot van <span style={{ color: C.messi, fontWeight: 400 }}>1.2 meter</span>
-        {" "}tot zijn dichtstbijzijnde verdediger — diezelfde Barrios die hij
-        één seconde eerder gepasseerd had. Vier verdedigers binnen tien meter.
-        Twee teamgenoten te ver om aan te spelen.
-        {" "}<span style={{ color: C.textDim, fontStyle: "italic" }}>
-          De "solo" was een doelpunt onder druk.
-        </span>
-      </div>
+
+      {hoeOn ? (
+        <div style={{ fontFamily: FONT.serif, fontSize: 22, lineHeight: 1.45,
+                      color: C.text, fontWeight: 300, maxWidth: 760 }}>
+          Messi schoot van <span style={{ color: C.messi, fontWeight: 400 }}>1.22 meter</span>
+          {" "}tot Barrios — krapper dan <span style={{ color: C.messi, fontWeight: 400 }}>83%</span>
+          {" "}van Barcelona-schoten. <span style={{ color: C.messi, fontWeight: 400 }}>Elke</span>
+          {" "}van zijn vijf touches was onder druk. In drie seconden maakte hij
+          {" "}<span style={{ color: C.messi, fontWeight: 400 }}>twee richtingswisselingen</span>
+          {" "}en passeerde Barrios — die meteen weer náást hem stond toen hij schoot.
+          {" "}<span style={{ color: C.textDim, fontStyle: "italic" }}>
+            De "solo" was geen wandeling. Het was een doelpunt onder volle druk.
+          </span>
+        </div>
+      ) : (
+        <div style={{ fontFamily: FONT.serif, fontSize: 22, lineHeight: 1.45,
+                      color: C.text, fontWeight: 300, maxWidth: 720 }}>
+          Messi schoot van <span style={{ color: C.messi, fontWeight: 400 }}>1.22 meter</span>
+          {" "}tot Barrios — die hij één seconde eerder passeerde, maar die
+          op het schot-moment weer náást hem stond. Vier verdedigers binnen
+          tien meter; geen vrije teamgenoot in de buurt.
+          {" "}<span style={{ color: C.textDim, fontStyle: "italic" }}>
+            Schakel <span style={{ color: C.messi }}>Hoe</span> in voor vergelijkingen met andere Barcelona-aanvallen.
+          </span>
+        </div>
+      )}
 
       <div style={{ marginTop: 28 }}>
         <button onClick={reset}

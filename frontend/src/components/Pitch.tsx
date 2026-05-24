@@ -1,6 +1,19 @@
-import type { AttackData, AttackEvent, Location } from "../types";
+// =============================================================================
+//  Pitch.tsx — basis-viz + Hoe-laag overlays.
+//
+//  BASIS (always on):  field lines, ball trail, ball, player markers, freeze frame
+//  HOE  (lens.hoe):    pressure ring, percentile labels at dribble/shot,
+//                      direction-change knikpunten (step 5e)
+//  WANNEER:            none here — wanneer-laag content goes in stap 6
+// =============================================================================
+import type { AttackData, AttackEvent, Location, ReferenceStats } from "../types";
 import { C, FONT } from "../lib/theme";
 import { isBallEvent } from "../lib/geometry";
+import { usePlayback } from "../store";
+import { tightnessRank } from "../lib/reference";
+import referenceStatsJson from "../data/reference_stats.json";
+
+const REF = referenceStatsJson as unknown as ReferenceStats;
 
 interface Props {
   data: AttackData;
@@ -139,6 +152,27 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
   const { px, py } = makeMappers(x, y, width, height);
   const events = data.events;
   const freeze = data.freeze_frame;
+  const hoeOn = usePlayback((s) => s.lens.hoe);
+
+  // ── HOE: pressure windows ──────────────────────────────────────────────────
+  // Build a list of [start, end] time-windows during which Messi is on the
+  // ball AND under pressure.  Each Messi event with under_pressure=true
+  // contributes a window [t, next_messi_event_or_end].  The visual ring is
+  // shown when realTime falls in any window.
+  const pressureWindows: { start: number; end: number }[] = [];
+  const messiEvents = events
+    .filter(e => e.player_short === "Messi")
+    .sort((a, b) => a.t_seconds - b.t_seconds);
+  for (let i = 0; i < messiEvents.length; i++) {
+    const e = messiEvents[i];
+    if (!e.under_pressure) continue;
+    const nxt = messiEvents[i + 1];
+    pressureWindows.push({
+      start: e.t_seconds,
+      end:   nxt ? nxt.t_seconds : (e.t_seconds + (e.duration ?? 0.5)),
+    });
+  }
+  const inPressure = pressureWindows.some(w => realTime >= w.start && realTime <= w.end);
 
   // Shot location (= Messi's position at the shot)
   const shotEvent = events.find(e => e.type === "Shot");
@@ -409,7 +443,30 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
         })}
       </g>
 
-      {/* Beat label flash */}
+      {/* HOE: richtingswisseling-knikpunten — open circles on the trail where
+          Messi's carry direction changes by >45° vs the next event vector.
+          For the Zaragoza attack, this happens at the end of each of his two
+          carries.  Hardcoded as a lookup (per-attack) so timing/placement is
+          deterministic relative to the trail, not derived at runtime. */}
+      {hoeOn && [
+        { x: 107.0, y: 27.9, t: 9.19 },   // end of Carry 1 (just before the dribble)
+        { x: 109.6, y: 30.1, t: 10.22 },  // end of Carry 2 (shot moment)
+      ].map((k, i) => {
+        if (realTime < k.t) return null;
+        const fade = smooth((realTime - k.t) / 0.35);
+        if (fade <= 0) return null;
+        // Slight outward grow on appearance
+        const r = 4 + (1 - fade) * 3;
+        return (
+          <g key={i} opacity={fade * 0.85}>
+            <circle cx={px(k.x)} cy={py(k.y)} r={r}
+                    fill="none" stroke={C.messi} strokeWidth={1.4} />
+          </g>
+        );
+      })}
+
+      {/* Beat label flash — BASIS shows the name; HOE appends a percentile
+          subscript so the viewer feels how rare passing a defender actually is. */}
       <g>
         {beats.map((b, i) => {
           const flashWindow = 0.7;
@@ -423,6 +480,12 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
                     fill={C.opp} fontSize={11} fontWeight={600}
                     letterSpacing="0.1em">
                 × {b.label.toUpperCase()}
+                {hoeOn && (
+                  <tspan fill={C.textDim} fontWeight={400} fontSize={9}
+                         letterSpacing="0.14em" fontStyle="italic">
+                    {"  · top 5%"}
+                  </tspan>
+                )}
               </text>
             </g>
           );
@@ -435,21 +498,52 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
           line from its event-location if applicable. */}
       {revealProgress > 0 && shotLoc && (
         <g>
-          {/* Messi space bubble — radius = distance to closest non-keeper opponent */}
-          {messiSpaceR !== null && (
-            <g opacity={smooth(revealProgress * 3) * 0.55}>
-              <circle cx={px(shotLoc[0])} cy={py(shotLoc[1])}
-                      r={(messiSpaceR / 120) * width}
-                      fill="none" stroke={C.messi} strokeWidth={0.8}
-                      strokeDasharray="2 3" opacity={0.7} />
-              {/* Radius label, positioned beside the bubble */}
-              <text x={px(shotLoc[0]) + (messiSpaceR / 120) * width + 6}
-                    y={py(shotLoc[1]) + 3} fill={C.messiSoft.length === 9 ? C.messi : C.messi}
-                    fontSize={10} letterSpacing="0.08em" opacity={0.85}>
-                {messiSpaceR.toFixed(1)} M TOT DICHTSTBIJZIJNDE
-              </text>
-            </g>
-          )}
+          {/* Messi space bubble — radius = distance to closest non-keeper opponent.
+              The bubble + raw distance label are BASIS-viz.  The percentile
+              context next to it (krapper dan X%) is the HOE-layer overlay. */}
+          {messiSpaceR !== null && (() => {
+            const labelX = px(shotLoc[0]) + (messiSpaceR / 120) * width + 6;
+            const labelY = py(shotLoc[1]) + 3;
+            // Tightness rank: smaller = more remarkable (tighter space).
+            const rank = tightnessRank(messiSpaceR, REF.hoe.space_to_nearest_at_shot_m.all);
+            const fadeIn = smooth(revealProgress * 3) * 0.55;
+            const hoeFade = smooth((revealProgress - 0.3) / 0.3);   // appear a bit after bubble
+            return (
+              <g>
+                {/* BASIS — bubble + raw distance */}
+                <g opacity={fadeIn}>
+                  <circle cx={px(shotLoc[0])} cy={py(shotLoc[1])}
+                          r={(messiSpaceR / 120) * width}
+                          fill="none" stroke={C.messi} strokeWidth={0.8}
+                          strokeDasharray="2 3" opacity={0.7} />
+                  <text x={labelX} y={labelY} fill={C.messi}
+                        fontSize={10} letterSpacing="0.08em" opacity={0.85}>
+                    {messiSpaceR.toFixed(1)} M TOT DICHTSTBIJZIJNDE
+                  </text>
+                </g>
+
+                {/* HOE — percentile framing + thin bar */}
+                {hoeOn && hoeFade > 0 && (
+                  <g opacity={hoeFade}>
+                    <text x={labelX} y={labelY + 14} fill={C.textDim}
+                          fontSize={10} letterSpacing="0.10em"
+                          fontStyle="italic">
+                      Krapper dan {rank}% van Barcelona-schoten
+                    </text>
+                    {/* Thin percentile bar: full range is 0..100, marker at rank */}
+                    <g transform={`translate(${labelX} ${labelY + 22})`}>
+                      <rect x={0} y={0} width={140} height={4}
+                            fill={C.line} opacity={0.5} />
+                      <rect x={0} y={0} width={140 * (rank / 100)} height={4}
+                            fill={C.messi} opacity={0.85} />
+                      <rect x={140 * (rank / 100) - 1} y={-2} width={2} height={8}
+                            fill={C.shot} />
+                    </g>
+                  </g>
+                )}
+              </g>
+            );
+          })()}
 
           {/* (shot trajectory is drawn separately as a curved arc above) */}
 
@@ -505,6 +599,29 @@ export default function Pitch({ data, x, y, width, height, realTime, phaseLabel,
           </g>
         </g>
       )}
+
+      {/* HOE: pressure ring — pulsing concentric circles around the live ball
+          whenever Messi is on the ball AND under_pressure.  Color is opp-red
+          (semantic: defenders are pressing).  Pulse uses wall-clock so it
+          breathes even during shot-hold when realTime is frozen. */}
+      {hoeOn && inPressure && ballPos && revealProgress < 0.2 && (() => {
+        const wallNow = Date.now() / 1000;
+        const cycle = 1.2;
+        const phase = (wallNow % cycle) / cycle;        // 0..1
+        const pulse = 0.5 + 0.5 * Math.sin(phase * Math.PI * 2);  // 0..1
+        const r1 = 13 + pulse * 3;
+        const r2 = 19 + pulse * 4;
+        const op1 = 0.25 + pulse * 0.15;
+        const op2 = 0.10 + pulse * 0.10;
+        return (
+          <g>
+            <circle cx={px(ballPos[0])} cy={py(ballPos[1])} r={r2}
+                    fill="none" stroke={C.opp} strokeWidth={0.8} opacity={op2} />
+            <circle cx={px(ballPos[0])} cy={py(ballPos[1])} r={r1}
+                    fill="none" stroke={C.opp} strokeWidth={1.2} opacity={op1} />
+          </g>
+        );
+      })()}
 
       {/* Live ball — hide once we're in the freeze-frame reveal so the shot
           dot and freeze frame can take center stage */}
